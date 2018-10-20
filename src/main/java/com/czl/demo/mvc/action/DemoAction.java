@@ -18,15 +18,11 @@ public class DemoAction {
 	private IDemoService demoService;
 	
 	@RequestMapping("/query.json")
-	public void query(HttpServletRequest req,HttpServletResponse resp,
+	public String query(HttpServletRequest req,HttpServletResponse resp,
 		   @RequestParam("name") String name){
 		String result = demoService.get(name);
 		System.out.println(result);
-//		try {
-//			resp.getWriter().write(result);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		return  result;
 	}
 	
 	@RequestMapping("/edit.json")
