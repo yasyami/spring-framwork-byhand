@@ -6,7 +6,7 @@
 
   <servlet>
     <servlet-name>gupaomvc</servlet-name>
-    <servlet-class>com.czl.spring.servlet.DispatchServlet</servlet-class>
+    <servlet-class>com.czl.spring.webmvc.servlet.DispatchServlet</servlet-class>
     <init-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>classpath:application.properties</param-value>

@@ -1,9 +1,10 @@
-package com.czl.spring.servlet;
+package com.czl.spring.webmvc.servlet;
 
 import com.czl.demo.mvc.action.DemoAction;
 import com.czl.spring.annotation.Autowired;
 import com.czl.spring.annotation.Controller;
 import com.czl.spring.annotation.Service;
+import com.czl.spring.context.ApplicationContext;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DispatchServlet extends HttpServlet {
 
+    private final String LOCATION ="contextConfigLocation";
 
     //配置文件的properties
     private Properties contextConfig = new Properties();
@@ -47,19 +49,66 @@ public class DispatchServlet extends HttpServlet {
     }
     @Override
     public void init(ServletConfig config) throws ServletException {
-        //定位
-        doLoadConfig(config.getInitParameter("contextConfigLocation"));
+        //初始化IOC容器  spring中 ioc和mvc容器是单独初始化的，tom老师说的是因为 mvc有j2ee的依赖
+        //我个人觉得是不是因为 spring ioc容器有单独使用的场景 所以 spring设计成可以单独初始化ioc容器
+        ApplicationContext context = new ApplicationContext(config.getInitParameter(LOCATION));
 
-        //加载
-        doScanner(contextConfig.getProperty("scanPackage"));
+        //初始化mvc
+        initStrategies(context);
 
-        //注册
-        doRegister();
-
-        //自动依赖注入
-        doAutowire();
+//        //定位
+//        doLoadConfig(config.getInitParameter("contextConfigLocation"));
+//
+//        //加载
+//        doScanner(contextConfig.getProperty("scanPackage"));
+//
+//        //注册
+//        doRegister();
+//
+//        //自动依赖注入
+//        doAutowire();
 
 //        super.init(config);
+    }
+
+    private void initStrategies(ApplicationContext context) {
+        initMultipartResolver(context);
+        initLocaleResolver(context);
+        initThemeResolver(context);
+        initHandlerMappings(context);
+        initHandlerAdapters(context);
+        initHandlerExceptionResolvers(context);
+        initRequestToViewNameTranslator(context);
+        initViewResolvers(context);
+        initFlashMapManager(context);
+
+    }
+
+    private void initFlashMapManager(ApplicationContext context) {
+    }
+
+    private void initViewResolvers(ApplicationContext context) {
+    }
+
+    private void initRequestToViewNameTranslator(ApplicationContext context) {
+    }
+
+    private void initHandlerExceptionResolvers(ApplicationContext context) {
+    }
+
+    private void initHandlerAdapters(ApplicationContext context) {
+    }
+
+    private void initHandlerMappings(ApplicationContext context) {
+    }
+
+    private void initThemeResolver(ApplicationContext context) {
+    }
+
+    private void initLocaleResolver(ApplicationContext context) {
+    }
+
+    private void initMultipartResolver(ApplicationContext context) {
     }
 
     private void doAutowire() {
