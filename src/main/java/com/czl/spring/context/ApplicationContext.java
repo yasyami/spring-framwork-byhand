@@ -1,17 +1,18 @@
 package com.czl.spring.context;
 
 import com.czl.spring.context.support.BeanDefinitionReader;
+import com.czl.spring.core.BeanFactory;
 
 import java.util.List;
 
-public class ApplicationContext {
+public class ApplicationContext extends DefaultListableBeanFactory implements BeanFactory{
 
     private String[] configLocations;
 
     private BeanDefinitionReader reader;
 
-    public ApplicationContext(String ... configLocations) {
-        this.configLocations=configLocations;
+    public ApplicationContext(String... configLocations) {
+        this.configLocations = configLocations;
         //ioc容器的入口方法
         refresh();
     }
@@ -30,8 +31,22 @@ public class ApplicationContext {
 
     private void doRegister(List<String> beanDefinitions) {
 
+        if (null == beanDefinitions || beanDefinitions.isEmpty()) {
+            return;
+        }
+        try {
+            for (String className : beanDefinitions) {
+                Class.forName(className);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+    }
 
+    @Override
+    public Object getBean(String beanName) {
+        return null;
     }
 
     //将beanDefinitions 注册值beanDefinitionMaps

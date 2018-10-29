@@ -42,8 +42,8 @@ public class DispatchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("----------------调用doPost-----------------");
-        DemoAction action = (DemoAction)beanMap.get("demoAction");
-        resp.getWriter().write( action.query(null,null,"czl"));
+//        DemoAction action = (DemoAction)beanMap.get("demoAction");
+//        resp.getWriter().write( action.query(null,null,"czl"));
 
         //super.doPost(req, resp);
     }
@@ -160,50 +160,50 @@ public class DispatchServlet extends HttpServlet {
 
     }
 
-    private void doRegister() {
-        if (classNames.isEmpty()) {
-            return;
-        }
-        for (String className : classNames) {
-            try {
-                Class<?> clazz = Class.forName(className);
-                if (clazz.isAnnotationPresent(Controller.class)) {
-                    String beanName = toLowerCase(clazz.getSimpleName());
-                    try {
-                        beanMap.put(beanName, clazz.newInstance());
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                } else if (clazz.isAnnotationPresent(Service.class)) {
-                    Service service = clazz.getAnnotation(Service.class);
-                    String beanName = service.value();
-                    if ("".equals(beanName)) {
-                        beanName = toLowerCase(clazz.getSimpleName());
-                    }
-                    Object instance = null;
-
-                    try {
-                        instance = clazz.newInstance();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                    beanMap.put(beanName, instance);
-                    Class<?>[] interfaces = clazz.getInterfaces();
-                    for (Class<?> c : interfaces) {
-                        beanMap.put(toLowerCase(c.getSimpleName()), instance);
-                    }
-                } else {
-                    continue;
-                }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    private void doRegister() {
+//        if (classNames.isEmpty()) {
+//            return;
+//        }
+//        for (String className : classNames) {
+//            try {
+//                Class<?> clazz = Class.forName(className);
+//                if (clazz.isAnnotationPresent(Controller.class)) {
+//                    String beanName = toLowerCase(clazz.getSimpleName());
+//                    try {
+//                        beanMap.put(beanName, clazz.newInstance());
+//                    } catch (InstantiationException e) {
+//                        e.printStackTrace();
+//                    } catch (IllegalAccessException e) {
+//                        e.printStackTrace();
+//                    }
+//                } else if (clazz.isAnnotationPresent(Service.class)) {
+//                    Service service = clazz.getAnnotation(Service.class);
+//                    String beanName =service.value();
+//                    if ("".equals(beanName)) {
+//                        beanName = toLowerCase(clazz.getSimpleName());
+//                    }
+//                    Object instance = null;
+//
+//                    try {
+//                        instance = clazz.newInstance();
+//                    } catch (InstantiationException e) {
+//                        e.printStackTrace();
+//                    } catch (IllegalAccessException e) {
+//                        e.printStackTrace();
+//                    }
+//                    beanMap.put(beanName, instance);
+//                    Class<?>[] interfaces = clazz.getInterfaces();
+//                    for (Class<?> c : interfaces) {
+//                        beanMap.put(toLowerCase(c.getSimpleName()), instance);
+//                    }
+//                } else {
+//                    continue;
+//                }
+//            } catch (ClassNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     private void doScanner(String pakageName) {
 

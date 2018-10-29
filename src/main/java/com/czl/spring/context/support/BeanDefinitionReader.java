@@ -48,7 +48,7 @@ public class BeanDefinitionReader {
     public BeanDefinitionReader(String... configLocations) {
         for (String configLocation : configLocations) {
             //初始化config信息
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream(configLocation);
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream(configLocation.split(":")[1]);
             try {
                 config.load(is);
             } catch (IOException e) {
