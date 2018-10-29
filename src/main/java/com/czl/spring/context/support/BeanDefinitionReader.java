@@ -1,5 +1,6 @@
 package com.czl.spring.context.support;
 
+import com.czl.spring.beans.BeanDefinition;
 import com.czl.spring.util.Assert;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public class BeanDefinitionReader {
         if(registerBeanClasses.contains(className)){
             BeanDefinition beanDefinition =new BeanDefinition();
             beanDefinition.setBeanClassName(className);
-            beanDefinition.setFactoryBeanName(className.substring(className.lastIndexOf(".")+1));
+            beanDefinition.setFactoryBeanName(firstToLowerCase(className.substring(className.lastIndexOf(".")+1)));
             return beanDefinition;
         }
         return null;
@@ -86,5 +87,11 @@ public class BeanDefinitionReader {
 
         }
 
+    }
+
+    private String firstToLowerCase(String str){
+        char[] chars = str.toCharArray();
+        chars[0]+=32;
+        return new String(chars);
     }
 }

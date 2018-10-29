@@ -1,4 +1,4 @@
-package com.czl.spring.context.support;
+package com.czl.spring.beans;
 
 public class BeanDefinition {
 
