@@ -2,6 +2,7 @@ package com.czl.spring.webmvc.servlet;
 
 import com.czl.demo.mvc.action.DemoAction;
 import com.czl.spring.annotation.*;
+import com.czl.spring.aop.AopProxyUtils;
 import com.czl.spring.context.ApplicationContext;
 import com.czl.spring.webmvc.HandlerAdapter;
 import com.czl.spring.webmvc.HandlerMapping;
@@ -68,18 +69,22 @@ public class DispatchServlet extends HttpServlet {
         //首先根据用户的请求地址获取一个handlerMapping
         HandlerMapping handler = getHandler(req);
 
-        //根据这个handler获取其方法上的参数的 handlerAdapter
+        if(null!=handler){
+            //根据这个handler获取其方法上的参数的 handlerAdapter
 
-        HandlerAdapter adapter=getHandlerAdapter(handler);
+            HandlerAdapter adapter=getHandlerAdapter(handler);
 
-        //获取到adapter之后 相当于 有了 handlerMapping中的  方法所在的对象(controller)
-        //方法的名称，以及其对应handlerAdapter中方法的参数
-        //下面开始调用这个方法
-        //在adapter中处理方法的调用以及返回
-        ModelAndView modelAndView =adapter.handle(req,resp,handler);
+            //获取到adapter之后 相当于 有了 handlerMapping中的  方法所在的对象(controller)
+            //方法的名称，以及其对应handlerAdapter中方法的参数
+            //下面开始调用这个方法
+            //在adapter中处理方法的调用以及返回
+            ModelAndView modelAndView =adapter.handle(req,resp,handler);
 
-        //将方法的返回值  modelAndView 交给视图解析器解析 并用resp写回
-        processDispatchResult(resp, modelAndView);
+            //将方法的返回值  modelAndView 交给视图解析器解析 并用resp写回
+            processDispatchResult(resp, modelAndView);
+        }
+
+
 
     }
 
@@ -219,8 +224,13 @@ public class DispatchServlet extends HttpServlet {
         //这里获取BeanDefinitionMap中的key 用于获取bean的实例
         String[] definitionNames = context.getBeanDefinitionNames();
         for(String beanName:definitionNames){
-            Object bean = context.getBean(beanName);
-            Class<?> beanClass = bean.getClass();
+            Object proxy = null;
+            try {
+                proxy = AopProxyUtils.getTargetObject(context.getBean(beanName));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Class<?> beanClass = proxy.getClass();
             //这里只获取controller
             if(!beanClass.isAnnotationPresent(Controller.class)){
                 continue;
@@ -242,7 +252,7 @@ public class DispatchServlet extends HttpServlet {
                             .replaceAll("/+","/");
                     Pattern pattern =Pattern.compile(regex);
                     //这里实例化一个handlerMapping
-                    handlerMappings.add(new HandlerMapping(bean,method,pattern));
+                    handlerMappings.add(new HandlerMapping(proxy,method,pattern));
                     System.out.println(regex);
                 }
             }

@@ -1,6 +1,12 @@
 package com.czl.spring.beans;
 
-public class BeanWrapper {
+import com.czl.spring.aop.AopConfig;
+import com.czl.spring.aop.AopProxy;
+import com.czl.spring.core.FactoryBean;
+
+public class BeanWrapper extends FactoryBean{
+
+    private AopProxy aopProxy=new AopProxy();
 
     private Object wrapperInstance;
 
@@ -10,8 +16,8 @@ public class BeanWrapper {
 
 
     public BeanWrapper(Object instance) {
-        this.originalInstance = instance;
-        this.wrapperInstance = instance;
+        this.originalInstance =instance;
+        this.wrapperInstance = aopProxy.getProxy(instance) ;
     }
 
     public Object getWrapperInstance() {
@@ -29,4 +35,8 @@ public class BeanWrapper {
     public void setBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
         this.beanPostProcessor = beanPostProcessor;
     }
+
+   public void setAopConfig(AopConfig aopConfig){
+        aopProxy.setConfig(aopConfig);
+   }
 }

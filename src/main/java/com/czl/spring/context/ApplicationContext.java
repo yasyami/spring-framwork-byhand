@@ -3,6 +3,8 @@ package com.czl.spring.context;
 import com.czl.spring.annotation.Autowired;
 import com.czl.spring.annotation.Controller;
 import com.czl.spring.annotation.Service;
+import com.czl.spring.aop.AopConfig;
+import com.czl.spring.aop.AopProxyUtils;
 import com.czl.spring.beans.BeanDefinition;
 import com.czl.spring.beans.BeanPostProcessor;
 import com.czl.spring.beans.BeanWrapper;
@@ -12,10 +14,13 @@ import com.czl.spring.util.Assert;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ApplicationContext extends DefaultListableBeanFactory implements BeanFactory {
 
@@ -48,15 +53,19 @@ public class ApplicationContext extends DefaultListableBeanFactory implements Be
 
     private void doAutoWired() {
         for (Map.Entry<String, BeanDefinition> entry : beanDefinitionMap.entrySet()) {
-            Object bean = getBean(entry.getKey());
-            populateBean(entry.getKey(), bean);
+            Object wrapperBean = getBean(entry.getKey());
+            try {
+                populateBean(AopProxyUtils.getTargetObject(wrapperBean));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
-    private void populateBean(String key, Object o) {
+    private void populateBean(Object wrapperBean) {
         try {
-            Class clazz = o.getClass();
+            Class clazz = wrapperBean.getClass();
             if (!(clazz.isAnnotationPresent(Controller.class)
                     || clazz.isAnnotationPresent(Service.class))) {
                 return;
@@ -68,9 +77,9 @@ public class ApplicationContext extends DefaultListableBeanFactory implements Be
                 boolean required = annotation.required();
                 if (required) {
                     String name = field.getType().getName();
-                    field.setAccessible(true);
                     BeanWrapper beanWrapper = beanWrapperMap.get(name);
-                    field.set(o, beanWrapper == null ? null : beanWrapper.getOriginalInstance());
+                    field.setAccessible(true);
+                    field.set(wrapperBean, beanWrapper == null ? null : beanWrapper.getWrapperInstance());
                 }
             }
         } catch (Exception e) {
@@ -128,6 +137,7 @@ public class ApplicationContext extends DefaultListableBeanFactory implements Be
             beanPostProcessor.postProcessAfterInitialization(instance, beanName);
             BeanWrapper beanWrapper = new BeanWrapper(instance);
             beanWrapper.setBeanPostProcessor(beanPostProcessor);
+            beanWrapper.setAopConfig(instanceAopConfig(beanDefinition));
             this.beanWrapperMap.put(beanName, beanWrapper);
             beanPostProcessor.postProcessBeforeInitialization(instance, beanName);
             return this.beanWrapperMap.get(beanName).getWrapperInstance();
@@ -135,6 +145,26 @@ public class ApplicationContext extends DefaultListableBeanFactory implements Be
             e.printStackTrace();
         }
         return null;
+    }
+
+    private AopConfig instanceAopConfig(BeanDefinition beanDefinition) throws Exception {
+        AopConfig config = new AopConfig();
+        String expression = reader.getConfig().getProperty("pointCut");
+        String[] before = reader.getConfig().getProperty("aspectBefore").split("\\s");
+        String[] after = reader.getConfig().getProperty("aspectAfter").split("\\s");
+        String beanClassName = beanDefinition.getBeanClassName();
+        Class<?> aClass = Class.forName(beanClassName);
+        Class<?> aspectClass = Class.forName(before[0]);
+        Pattern pattern =Pattern.compile(expression);
+        for (Method method:aClass.getMethods()){
+            Matcher matcher =pattern.matcher(method.toString());
+            if (matcher.matches()) {
+               config.put(method,aspectClass.newInstance(),
+                       new Method[]{aspectClass.getMethod(before[1]),aspectClass.getMethod(after[1])});
+            }
+        }
+
+        return config;
     }
 
     private Object instanceBean(BeanDefinition beanDefinition) {
