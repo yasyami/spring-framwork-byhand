@@ -56,18 +56,6 @@ public class DispatchServlet extends HttpServlet {
         //初始化mvc
         initStrategies(context);
 
-        //定位
-//        doLoadConfig(config.getInitParameter("contextConfigLocation"));
-//
-        //加载
-//        doScanner(contextConfig.getProperty("scanPackage"));
-//
-        //注册
-//        doRegister();
-//
-        //自动依赖注入
-//        doAutowire();
-
 //        super.init(config);
     }
 
