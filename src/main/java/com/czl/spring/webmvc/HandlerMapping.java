@@ -5,9 +5,9 @@ import java.util.regex.Pattern;
 
 public class HandlerMapping {
 
-    private Object controller;
-    private Method method;
-    private Pattern pattern;
+    private Object controller;//url对应的Controller
+    private Method method;//url对应的method
+    private Pattern pattern;//url的封装
 
     public HandlerMapping(Object controller, Method method, Pattern pattern) {
         this.controller = controller;

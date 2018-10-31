@@ -5,10 +5,13 @@ import com.czl.spring.annotation.Autowired;
 import com.czl.spring.annotation.Controller;
 import com.czl.spring.annotation.RequestMapping;
 import com.czl.spring.annotation.RequestParam;
+import com.czl.spring.webmvc.ModelAndView;
 
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/demo")
@@ -18,11 +21,13 @@ public class DemoAction {
 	private IDemoService demoService;
 	
 	@RequestMapping("/query.json")
-	public String query(HttpServletRequest req,HttpServletResponse resp,
-		   @RequestParam("name") String name){
+	public ModelAndView query(HttpServletRequest req, HttpServletResponse resp,
+							  @RequestParam("name") String name){
 		String result = demoService.get(name);
-		System.out.println(result);
-		return  result;
+		Map<String,String> map = new HashMap<String, String>();
+		map.put("name",result);
+		ModelAndView mv =new ModelAndView("first.html",map);
+		return mv;
 	}
 	
 	@RequestMapping("/edit.json")

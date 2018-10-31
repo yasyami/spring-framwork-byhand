@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class ApplicationContext extends DefaultListableBeanFactory implements BeanFactory {
 
@@ -120,11 +121,6 @@ public class ApplicationContext extends DefaultListableBeanFactory implements Be
                     fieldName =firstToLowerCase(field.getType().getSimpleName());
                 }
                 getBean(fieldName);
-//                BeanDefinition beanDefinitionOth=beanDefinitionMap.get(fieldName);
-//                Object instance = instanceBean(beanDefinitionOth);
-//                Assert.notNull(instance);
-//                BeanWrapper beanWrapper = new BeanWrapper(instance);
-//                this.beanWrapperMap.put(fieldName, beanWrapper);
             }
             BeanPostProcessor beanPostProcessor = new BeanPostProcessor();
             Object instance = instanceBean(beanDefinition);
@@ -165,6 +161,14 @@ public class ApplicationContext extends DefaultListableBeanFactory implements Be
         char[] chars = str.toCharArray();
         chars[0]+=32;
         return new String(chars);
+    }
+
+    public String[] getBeanDefinitionNames(){
+        return  this.beanDefinitionMap.keySet().toArray(new String[this.beanDefinitionMap.size()]);
+    }
+
+    public Properties getConfig(){
+      return this.reader.getConfig();
     }
 
 }
