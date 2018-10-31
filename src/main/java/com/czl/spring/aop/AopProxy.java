@@ -32,7 +32,7 @@ public class AopProxy implements InvocationHandler{
         }
 
         //这里调用的是原生方法
-        m.invoke(this.target,args);
+        Object invoke = m.invoke(this.target, args);
 
         System.out.println(args);
 
@@ -42,7 +42,7 @@ public class AopProxy implements InvocationHandler{
             aspect.getPoints()[1].invoke(aspect.getAspect());
         }
 
-        return null;
+        return invoke;
 
 
     }
